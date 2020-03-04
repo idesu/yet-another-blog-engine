@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %} Лента подписок {% endblock %}
+
+{% block content %}
+{% load cache %}
+
+<main role="main" class="container">
+
+    {% include "menu.html" with follow=True %}
+
+        <div class="table">
+        <!-- {% now "jS F Y H:i" %} -->
+                <h1>Лента подписок</h1>
+                <hr>
+
+        <!-- Вывод ленты записей -->
+                {% for post in page %}
+                         {% include "post_item.html" with post=post %}
+                {% endfor %}
+
+        <!-- Вывод пагинатора -->
+                {% if page.has_other_pages %}
+                        {% include "paginator.html" with items=page paginator=paginator%}
+                {% endif %}
+
+        </div>
+</main>
+{% endblock %}

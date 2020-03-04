@@ -1,2 +1,1 @@
-# yet-another-blog-engine
-My Django learning project
+It's just my training project to learn Django.
