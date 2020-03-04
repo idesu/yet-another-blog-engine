@@ -7,8 +7,6 @@ __pycache__/
 
 .vscode/
 
-static/
-posts/static/
 media/
 
 */migrations/
