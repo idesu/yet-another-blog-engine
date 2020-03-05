@@ -85,9 +85,11 @@ def profile(request, username):
         .order_by('-pub_date')
         .annotate(comment_count=Count('post_comments'))
     )
+    counts = (
+        User.objects.annotate(followers=Count('follower'), followings=Count('following'))
+        .get(id=user.id)
+    )
 
-    user_followers = Follow.objects.filter(author=user).count
-    user_follow = Follow.objects.filter(user=user).count
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
@@ -99,8 +101,8 @@ def profile(request, username):
             'profile': user,
             'paginator': paginator,
             'following': following,
-            "user_followers": user_followers,
-            "user_follow": user_follow
+            'user_followers': counts.followers,
+            'user_follow': counts.followings
         }
     )
 
@@ -108,8 +110,10 @@ def profile(request, username):
 def post_view(request, username, post_id):
     user = get_object_or_404(User, username=username)
     post = get_object_or_404(Post, id=post_id, author=user.id)
-    user_followers = Follow.objects.filter(author=user).count
-    user_follow = Follow.objects.filter(user=user).count
+    counts = (
+        User.objects.annotate(followers=Count('follower'), followings=Count('following'))
+        .get(id=user.id)
+    )
     posts_count = Post.objects.filter(
         author=user).count()
     comments = Comment.objects.select_related(
@@ -124,8 +128,9 @@ def post_view(request, username, post_id):
             'form': form,
             'posts_count': posts_count,
             'author': user,
-            "user_followers": user_followers,
-            "user_follow": user_follow}
+            'user_followers': counts.followers,
+            'user_follow': counts.followings
+        }
     )
 
 
@@ -170,9 +175,8 @@ def add_comment(request, username, post_id):
 def profile_follow(request, username):
     user = get_object_or_404(User, username=request.user.username)
     author = get_object_or_404(User, username=username)
-    exist = Follow.objects.filter(user=user, author=author).exists()
-    if user != author and not exist:
-        Follow.objects.create(user=request.user, author=author)
+    if user != author:
+        Follow.objects.get_or_create(user=request.user, author=author)
     return redirect('profile', username=username)
 
 
@@ -181,7 +185,7 @@ def profile_unfollow(request, username):
     user = get_object_or_404(User, username=request.user.username)
     author = get_object_or_404(User, username=username)
     obj = Follow.objects.filter(user=user, author=author)
-    if obj:
+    if obj.exists():
         obj.delete()
     return redirect('profile', username=username)
 
