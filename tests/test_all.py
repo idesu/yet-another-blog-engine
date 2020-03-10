@@ -117,7 +117,7 @@ class TestPostsApp(TestCase):
         self.assertFalse(self.client.get(
             f"/{user.username}/").context['following'])
 
-# Прошу прощения за дичь, что тут была. Еще не привык к тому, что мой код приходится кому-то читать.
+
     def test_following_read_feed(self):
         follower_user = self.user
         writer_user = User.objects.create(
