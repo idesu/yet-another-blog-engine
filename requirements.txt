@@ -1,4 +1,4 @@
-django==2.2.13
+django==2.2.20
 pillow==7.1.0
 sorl-thumbnail==12.6.3
 django-debug-toolbar
